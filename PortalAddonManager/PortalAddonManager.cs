@@ -7,42 +7,36 @@ namespace PortalAddonManager
 {
     public partial class PortalAddonManager : Form
     {
-        private string? steamPath;
-        private string? portalAddonPath;
-
-        private static string? testAddon;
-        private static string? addonDestination;
+        private string? localSteamPath = GameDataPaths.steamPath;
+        private string? localPortalAddonPath = GameDataPaths.portalAddonPath;
         public PortalAddonManager()
         {
             InitializeComponent();
             CheckSerializedPath();
             GetPortalAddonPath();
-
-            checkedListBox1.SetItemChecked(0, true);
         }
 
         #region MY_FUNCTIONS
         private void GetPortalAddonPath()
         {
-            if(steamPath == null)
+            if(localSteamPath == null)
             {
                 Process[] steam = Process.GetProcessesByName("steam");
                 if (steam.Length > 0)
                 {
-                    steamPath = steam[0].MainModule.FileName;
+                    localSteamPath = steam[0].MainModule.FileName;
 
-                    if(steamPath != null)
+                    if(localSteamPath != null)
                     {
-                        steamPath = steamPath.Remove(29, 9);
+                        localSteamPath = localSteamPath.Remove(29, 9);
                     }
 
-                    if(portalAddonPath == null)
+                    if(localPortalAddonPath == null)
                     {
-                        portalAddonPath = steamPath + "steamapps\\common\\Portal\\portal\\custom";
+                        localPortalAddonPath = localSteamPath + "steamapps\\common\\Portal\\portal\\custom";
                     }
 
-                    Debug.WriteLine(portalAddonPath);
-                    LookForAddons(portalAddonPath);
+                    Debug.WriteLine(localPortalAddonPath);
                 }
                 else
                 {
@@ -55,57 +49,10 @@ namespace PortalAddonManager
             }
         }
 
-        private static void LookForAddons(string addonLocation)
-        {
-            string[] addons = Directory.GetFiles(addonLocation, "*.vpk");
-
-            if(addons.Length > 0)
-            {
-                testAddon = addons[0];
-                addonDestination = testAddon + ".inactive";
-
-                Debug.WriteLine(testAddon);
-
-            } else
-            {
-                Console.WriteLine("No addons found");
-            }
-            
-        }
-
-        private static void CheckSerializedPath()
+        private void CheckSerializedPath()
         {
             Debug.WriteLine("Serialization not implemented yet :(");
         }
         #endregion
-
-        private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            //if we uncheck
-            if(checkedListBox1.GetItemChecked(0) == false)
-            {
-                if(testAddon != null && addonDestination != null)
-                {
-                    AddonStateManager.Disable(testAddon, addonDestination);
-                }
-                else
-                {
-                    Console.WriteLine("How the fuck?");
-                }
-            }
-
-            //if we check
-            if(checkedListBox1.GetItemChecked(0) != false)
-            {
-                if (testAddon != null && addonDestination != null)
-                {
-                    AddonStateManager.Enable(addonDestination, testAddon);
-                }
-                else
-                {
-                    Console.WriteLine("How the fuck?");
-                }
-            }
-        }
     }
 }

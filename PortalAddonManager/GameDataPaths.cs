@@ -12,6 +12,12 @@ namespace PortalAddonManager
     [Serializable]
     internal class GameDataPaths
     {
+        public static string? steamPath;
+        public static string? portalAddonPath;
 
+        private void TryLoadSerializedData()
+        {
+
+        }
     }
 }
