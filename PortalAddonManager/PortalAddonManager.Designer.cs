@@ -28,7 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.SuspendLayout();
+            // 
+            // checkedListBox1
+            // 
+            this.checkedListBox1.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.checkedListBox1.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.checkedListBox1.FormattingEnabled = true;
+            this.checkedListBox1.Items.AddRange(new object[] {
+            "testAddon (Crosshair.vpk)"});
+            this.checkedListBox1.Location = new System.Drawing.Point(12, 185);
+            this.checkedListBox1.Name = "checkedListBox1";
+            this.checkedListBox1.Size = new System.Drawing.Size(776, 58);
+            this.checkedListBox1.TabIndex = 0;
+            this.checkedListBox1.ThreeDCheckBoxes = true;
+            this.checkedListBox1.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox1_ItemCheck);
             // 
             // PortalAddonManager
             // 
@@ -36,6 +51,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(29)))), ((int)(((byte)(38)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.checkedListBox1);
             this.Name = "PortalAddonManager";
             this.Text = "Portal Addon Manager";
             this.ResumeLayout(false);
@@ -43,5 +59,7 @@
         }
 
         #endregion
+
+        private CheckedListBox checkedListBox1;
     }
 }
