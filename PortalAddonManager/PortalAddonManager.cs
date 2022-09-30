@@ -15,7 +15,7 @@ namespace PortalAddonManager
         public PortalAddonManager()
         {
             InitializeComponent();
-            CheckSerializedPath();
+            //CheckSerializedPath();
             GetPortalAddonPath();
 
             checkedListBox1.SetItemChecked(0, true);
@@ -81,8 +81,8 @@ namespace PortalAddonManager
 
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            //if we uncheck
-            if(checkedListBox1.GetItemChecked(0) == false)
+            //if we uncheck, disable the addon
+            if(checkedListBox1.GetItemChecked(0) != false)
             {
                 if(testAddon != null && addonDestination != null)
                 {
@@ -94,8 +94,8 @@ namespace PortalAddonManager
                 }
             }
 
-            //if we check
-            if(checkedListBox1.GetItemChecked(0) != false)
+            //if we check, enable the addon
+            if(checkedListBox1.GetItemChecked(0) == false)
             {
                 if (testAddon != null && addonDestination != null)
                 {

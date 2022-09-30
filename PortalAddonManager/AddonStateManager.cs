@@ -23,8 +23,11 @@ namespace PortalAddonManager
         //take disabled name and revert back to active (remove .inactive)
         public static void Enable(string disabledAddonName, string enabledAddonName)
         {
-            File.Copy(disabledAddonName, enabledAddonName, true);
-            File.Delete(disabledAddonName);
+            if(File.Exists(disabledAddonName))
+            {
+                File.Copy(disabledAddonName, enabledAddonName, true);
+                File.Delete(disabledAddonName);
+            }
 
             if (!File.Exists(disabledAddonName))
             {
