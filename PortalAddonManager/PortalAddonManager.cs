@@ -12,13 +12,17 @@ namespace PortalAddonManager
 
         private static string? testAddon;
         private static string? addonDestination;
+
         public PortalAddonManager()
         {
             InitializeComponent();
-            //CheckSerializedPath();
             GetPortalAddonPath();
 
-            checkedListBox1.SetItemChecked(0, true);
+            if(portalAddonPath != null)
+            {
+                LookForAddons(portalAddonPath);
+            }
+
         }
 
         #region MY_FUNCTIONS
@@ -42,7 +46,7 @@ namespace PortalAddonManager
                     }
 
                     Debug.WriteLine(portalAddonPath);
-                    LookForAddons(portalAddonPath);
+                    
                 }
                 else
                 {
@@ -55,11 +59,22 @@ namespace PortalAddonManager
             }
         }
 
-        private static void LookForAddons(string addonLocation)
+        private void LookForAddons(string addonLocation)
         {
             string[] addons = Directory.GetFiles(addonLocation, "*.vpk");
 
-            if(addons.Length > 0)
+            checkedListBox1.DisplayMember = "name";
+            checkedListBox1.ValueMember = "description";
+
+            // Add each .vpk addon file to the checkedboxlist and set it to active by default
+            for (int i = 0; i < addons.Length; i++)
+            {
+                checkedListBox1.Items.Insert(i, new Addon { Name = addons[i], Description = "test" });
+                checkedListBox1.SetItemChecked(i, true);
+            }
+
+
+            if (addons.Length > 0)
             {
                 testAddon = addons[0];
                 addonDestination = testAddon + ".inactive";
@@ -73,15 +88,11 @@ namespace PortalAddonManager
             
         }
 
-        private static void CheckSerializedPath()
-        {
-            Debug.WriteLine("Serialization not implemented yet :(");
-        }
         #endregion
 
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            //if we uncheck, disable the addon
+            // If we uncheck, disable the addon
             if(checkedListBox1.GetItemChecked(0) != false)
             {
                 if(testAddon != null && addonDestination != null)
@@ -94,7 +105,7 @@ namespace PortalAddonManager
                 }
             }
 
-            //if we check, enable the addon
+            // If we check, enable the addon
             if(checkedListBox1.GetItemChecked(0) == false)
             {
                 if (testAddon != null && addonDestination != null)
