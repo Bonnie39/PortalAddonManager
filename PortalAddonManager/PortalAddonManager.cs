@@ -3,6 +3,7 @@ using System.Linq;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace PortalAddonManager
 {
@@ -29,6 +30,8 @@ namespace PortalAddonManager
         private string? steamPath;
         private string? portalAddonPath;
 
+        private string? jsonDeserializeTemp;
+
         private static string? addonOrigin;
         private static string? addonDestination;
 
@@ -54,25 +57,25 @@ namespace PortalAddonManager
         #region MY_FUNCTIONS
         private void GetPortalAddonPath()
         {
-            if(steamPath == null)
+            if (steamPath == null)
             {
                 Process[] steam = Process.GetProcessesByName("steam");
                 if (steam.Length > 0)
                 {
                     steamPath = steam[0].MainModule.FileName;
 
-                    if(steamPath != null)
+                    if (steamPath != null)
                     {
                         steamPath = steamPath.Remove(29, 9);
                     }
 
-                    if(portalAddonPath == null)
+                    if (portalAddonPath == null)
                     {
                         portalAddonPath = steamPath + "steamapps\\common\\Portal\\portal\\custom";
                     }
 
                     Debug.WriteLine(portalAddonPath);
-                    
+
                 }
                 else
                 {
@@ -97,36 +100,72 @@ namespace PortalAddonManager
 
                 fullAddonList = addons.Concatenate(disabledAddons);
 
+                string? temp2;
+                string? temp3;
+                string? jsonFile;
                 for (int i = 0; i < fullAddonList.Length; i++)
                 {
-                    string temp = Path.GetFileName(fullAddonList[i]);
-                    string? temp2;
+                    string? temp = Path.GetFileName(fullAddonList[i]);
 
                     if (temp.EndsWith(".inactive"))
                     {
                         temp2 = temp.Remove(temp.Length - 9, 9);
-                        checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
-                        checkedListBox1.SetItemChecked(i, false);
+
+                        if (File.Exists(portalAddonPath + "\\" + temp2 + ".json")) {
+
+                            jsonFile = portalAddonPath + "\\" + temp2 + ".json";
+                            Debug.WriteLine(jsonFile);
+                            using StreamReader file = File.OpenText(jsonFile);
+
+                            JsonSerializer serializer = new JsonSerializer();
+                            Addon addon = (Addon)serializer.Deserialize(file, typeof(Addon));
+
+                            if (addon != null)
+                            {
+                                checkedListBox1.Items.Insert(i, new Addon { Name = addon.Name, Description = "test" });
+                                checkedListBox1.SetItemChecked(i, false);
+                            }
+
+                        } else
+                        {
+                            checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
+                            checkedListBox1.SetItemChecked(i, false);
+                        }
                     }
                     else
                     {
                         temp2 = temp;
-                        checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
-                        checkedListBox1.SetItemChecked(i, true);
+                        temp3 = temp.Remove(temp.Length - 4, 4);
+                        if (File.Exists(portalAddonPath + "\\" + temp3 + ".json"))
+                        {
+
+                            jsonFile = portalAddonPath + "\\" + temp3 + ".json";
+                            Debug.WriteLine(jsonFile);
+                            using StreamReader file = File.OpenText(jsonFile);
+
+                            JsonSerializer serializer = new JsonSerializer();
+                            Addon addon = (Addon)serializer.Deserialize(file, typeof(Addon));
+
+                            if (addon != null)
+                            {
+                                checkedListBox1.Items.Insert(i, new Addon { Name = addon.Name, Description = "test" });
+                                checkedListBox1.SetItemChecked(i, true);
+                            } else
+                            {
+                                checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
+                                checkedListBox1.SetItemChecked(i, true);
+                            }
+                        }
                     }
-
                 }
-
             }
         }
+#endregion
 
-        #endregion
-
-        #region FUNCTIONS_INITIALLY_GENERATED_BY_VISUAL_STUDIO
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // If we uncheck, disable the addon
-            if(checkedListBox1.GetItemChecked(e.Index) != false)
+            if (checkedListBox1.GetItemChecked(e.Index) != false)
             {
                 if (fullAddonList != null)
                 {
@@ -153,9 +192,9 @@ namespace PortalAddonManager
             }
 
             // If we check, enable the addon
-            if(checkedListBox1.GetItemChecked(e.Index) == false)
+            if (checkedListBox1.GetItemChecked(e.Index) == false)
             {
-                if(fullAddonList != null)
+                if (fullAddonList != null)
                 {
                     if (fullAddonList[e.Index].EndsWith(".inactive"))
                     {
@@ -179,6 +218,5 @@ namespace PortalAddonManager
                 }
             }
         }
-        #endregion
     }
 }
