@@ -30,8 +30,6 @@ namespace PortalAddonManager
         private string? steamPath;
         private string? portalAddonPath;
 
-        private string? jsonDeserializeTemp;
-
         private static string? addonOrigin;
         private static string? addonDestination;
 
@@ -110,11 +108,13 @@ namespace PortalAddonManager
                     if (temp.EndsWith(".inactive"))
                     {
                         temp2 = temp.Remove(temp.Length - 9, 9);
+                        temp3 = temp.Remove(temp.Length - 13, 13);
 
-                        if (File.Exists(portalAddonPath + "\\" + temp2 + ".json")) {
+                        jsonFile = portalAddonPath + "\\" + temp3 + ".json";
+                        if (File.Exists(jsonFile)) {
 
-                            jsonFile = portalAddonPath + "\\" + temp2 + ".json";
                             Debug.WriteLine(jsonFile);
+
                             using StreamReader file = File.OpenText(jsonFile);
 
                             JsonSerializer serializer = new JsonSerializer();
@@ -136,10 +136,9 @@ namespace PortalAddonManager
                     {
                         temp2 = temp;
                         temp3 = temp.Remove(temp.Length - 4, 4);
-                        if (File.Exists(portalAddonPath + "\\" + temp3 + ".json"))
+                        jsonFile = portalAddonPath + "\\" + temp3 + ".json";
+                        if (File.Exists(jsonFile))
                         {
-
-                            jsonFile = portalAddonPath + "\\" + temp3 + ".json";
                             Debug.WriteLine(jsonFile);
                             using StreamReader file = File.OpenText(jsonFile);
 
@@ -150,11 +149,11 @@ namespace PortalAddonManager
                             {
                                 checkedListBox1.Items.Insert(i, new Addon { Name = addon.Name, Description = "test" });
                                 checkedListBox1.SetItemChecked(i, true);
-                            } else
-                            {
-                                checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
-                                checkedListBox1.SetItemChecked(i, true);
                             }
+                        } else
+                        {
+                            checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
+                            checkedListBox1.SetItemChecked(i, true);
                         }
                     }
                 }
