@@ -7,24 +7,6 @@ using Newtonsoft.Json;
 
 namespace PortalAddonManager
 {
-
-    public static class ConcatFunction
-    {
-        public static T[] Concatenate<T>(this T[] first, T[] second)
-        {
-            if (first == null)
-            {
-                return second;
-            }
-            if (second == null)
-            {
-                return first;
-            }
-
-            return first.Concat(second).ToArray();
-        }
-    }
-
     public partial class PortalAddonManager : Form
     {
         private string? steamPath;
@@ -101,6 +83,7 @@ namespace PortalAddonManager
                 string? temp2;
                 string? temp3;
                 string? jsonFile;
+
                 for (int i = 0; i < fullAddonList.Length; i++)
                 {
                     string? temp = Path.GetFileName(fullAddonList[i]);
@@ -111,7 +94,8 @@ namespace PortalAddonManager
                         temp3 = temp.Remove(temp.Length - 13, 13);
 
                         jsonFile = portalAddonPath + "\\" + temp3 + ".json";
-                        if (File.Exists(jsonFile)) {
+                        if (File.Exists(jsonFile))
+                        {
 
                             Debug.WriteLine(jsonFile);
 
@@ -126,7 +110,8 @@ namespace PortalAddonManager
                                 checkedListBox1.SetItemChecked(i, false);
                             }
 
-                        } else
+                        }
+                        else
                         {
                             checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
                             checkedListBox1.SetItemChecked(i, false);
@@ -150,7 +135,8 @@ namespace PortalAddonManager
                                 checkedListBox1.Items.Insert(i, new Addon { Name = addon.Name, Description = "test" });
                                 checkedListBox1.SetItemChecked(i, true);
                             }
-                        } else
+                        }
+                        else
                         {
                             checkedListBox1.Items.Insert(i, new Addon { Name = temp2, Description = "test" });
                             checkedListBox1.SetItemChecked(i, true);
@@ -216,6 +202,24 @@ namespace PortalAddonManager
                     Console.WriteLine("How the fuck?");
                 }
             }
+        }
+    }
+
+
+    public static class ConcatFunction
+    {
+        public static T[] Concatenate<T>(this T[] first, T[] second)
+        {
+            if (first == null)
+            {
+                return second;
+            }
+            if (second == null)
+            {
+                return first;
+            }
+
+            return first.Concat(second).ToArray();
         }
     }
 }
