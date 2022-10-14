@@ -29,8 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PortalAddonManager));
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.guna2BorderlessForm1 = new Guna.UI2.WinForms.Guna2BorderlessForm(this.components);
+            this.AddonListLabel = new System.Windows.Forms.Label();
+            this.ExitButton = new Guna.UI2.WinForms.Guna2ImageButton();
             this.SuspendLayout();
             // 
             // checkedListBox1
@@ -55,6 +58,34 @@
             this.guna2BorderlessForm1.DockForm = false;
             this.guna2BorderlessForm1.DockIndicatorTransparencyValue = 0.6D;
             this.guna2BorderlessForm1.DragStartTransparencyValue = 1D;
+            this.guna2BorderlessForm1.TransparentWhileDrag = true;
+            // 
+            // AddonListLabel
+            // 
+            this.AddonListLabel.AutoSize = true;
+            this.AddonListLabel.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AddonListLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.AddonListLabel.Location = new System.Drawing.Point(12, 26);
+            this.AddonListLabel.Name = "AddonListLabel";
+            this.AddonListLabel.Size = new System.Drawing.Size(92, 30);
+            this.AddonListLabel.TabIndex = 1;
+            this.AddonListLabel.Text = "Addons:";
+            // 
+            // ExitButton
+            // 
+            this.ExitButton.CheckedState.ImageSize = new System.Drawing.Size(64, 64);
+            this.ExitButton.HoverState.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image")));
+            this.ExitButton.HoverState.ImageSize = new System.Drawing.Size(64, 64);
+            this.ExitButton.Image = ((System.Drawing.Image)(resources.GetObject("ExitButton.Image")));
+            this.ExitButton.ImageOffset = new System.Drawing.Point(0, 0);
+            this.ExitButton.ImageRotate = 0F;
+            this.ExitButton.Location = new System.Drawing.Point(703, 389);
+            this.ExitButton.Name = "ExitButton";
+            this.ExitButton.PressedState.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image1")));
+            this.ExitButton.PressedState.ImageSize = new System.Drawing.Size(64, 64);
+            this.ExitButton.Size = new System.Drawing.Size(64, 54);
+            this.ExitButton.TabIndex = 2;
+            this.ExitButton.Click += new System.EventHandler(this.ExitButton_Click);
             // 
             // PortalAddonManager
             // 
@@ -62,12 +93,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(51)))), ((int)(((byte)(73)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.ExitButton);
+            this.Controls.Add(this.AddonListLabel);
             this.Controls.Add(this.checkedListBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "PortalAddonManager";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Portal Addon Manager";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -75,5 +109,7 @@
 
         private CheckedListBox checkedListBox1;
         private Guna.UI2.WinForms.Guna2BorderlessForm guna2BorderlessForm1;
+        private Label AddonListLabel;
+        private Guna.UI2.WinForms.Guna2ImageButton ExitButton;
     }
 }
