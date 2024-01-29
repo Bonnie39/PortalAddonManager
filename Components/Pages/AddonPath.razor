@@ -1,0 +1,157 @@
+﻿@page "/myaddons"
+
+<h1>Library</h1>
+
+<p role="status">Addon Installation Path: @portalAddonPath</p>
+
+<!--<button class="btn btn-primary" @onclick="LocatePath">Get Path</button>-->
+
+<div class="addons-list">
+    @foreach (var addonFile in GetAddonFiles())
+    {
+        <div class="addon-card">
+            <div class="addon-header">
+                <div>
+                    <h2>@addonFile.JsonData.Name</h2>
+                    <p class="author">@addonFile.JsonData.Author</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .addons-list {
+        margin-top: 20px;
+    }
+
+    .addon-card {
+        background-color: #f8f8f8;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .addon-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .addon-card h2{ 
+        margin: 0;
+        font-size: 1.2em;
+    }
+
+    .author {
+        margin: 0;
+        font-size: 0.8em;
+    }
+
+    .addon-description {
+        margin-top: 10px;
+    }
+</style>
+
+@code {
+
+    public static string? steamPath;
+    public static string? portalAddonPath;
+
+    protected override void OnInitialized()
+    {
+        LocatePath();
+    }
+
+    private void LocatePath()
+    {
+        if (steamPath == null)
+        {
+            Process[] steam = Process.GetProcessesByName("steam");
+            if (steam.Length > 0)
+            {
+                steamPath = steam[0].MainModule.FileName;
+
+                if (steamPath != null)
+                {
+                    steamPath = steamPath.Remove(29, 9);
+                }
+
+                if (portalAddonPath == null)
+                {
+                    portalAddonPath = steamPath + "steamapps\\common\\Portal\\portal\\custom";
+                }
+
+                Debug.WriteLine(portalAddonPath);
+
+            }
+            else
+            {
+                Debug.WriteLine("Unable to find Steam. Make sure it is open.");
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    private IEnumerable<AddonInfo> GetAddonFiles()
+    {
+        if (Directory.Exists(portalAddonPath))
+        {
+            var vpkFiles = Directory.GetFiles(portalAddonPath, "*.vpk");
+
+            foreach (var vpkFile in vpkFiles)
+            {
+                var baseName = Path.GetFileNameWithoutExtension(vpkFile);
+                var jsonFile = Path.Combine(portalAddonPath, $"{baseName}.json");
+
+                if (File.Exists(jsonFile))
+                {
+                    var jsonData = JsonConvert.DeserializeObject<AddonData>(File.ReadAllText(jsonFile));
+                    yield return new AddonInfo
+                        {
+                            Name = baseName,
+                            JsonData = jsonData
+                        };
+                }
+                else
+                {
+                    // Set default values for addons without a matching JSON file
+                    yield return new AddonInfo
+                        {
+                            JsonData = new AddonData
+                            {
+                                Name = Path.GetFileName(vpkFile),
+                                Author = "Unknown Author",
+                                Description = "Unknown Addon"
+                            }
+                        };
+                }
+            }
+        }
+        else
+        {
+            Debug.WriteLine("Portal addon path not found.");
+        }
+
+        // Use yield break to end the iteration
+        yield break;
+    }
+
+
+    private class AddonInfo
+    {
+        public string Name { get; set; } = string.Empty;
+        public AddonData JsonData { get; set; } = new AddonData();
+    }
+
+    public class AddonData
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Author { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}
