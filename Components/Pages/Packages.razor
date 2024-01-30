@@ -1,0 +1,48 @@
+﻿@page "/packages/{repoName}"
+
+@using PortalAddonManager.Models
+@using PortalAddonManager.Services
+@inject DataService DataService
+
+<h1>Packages for @repoName</h1>
+
+@foreach (var repo in DataService.Repos)
+{
+    if (repo.name == repoName)
+    {
+        <div class="package-container">
+            @foreach (var package in repo.packages)
+            {
+                <div class="package-item">
+                    <h5>@package.name</h5>
+                    <p>@package.subtitle</p>
+                    <img src="@package.iconURL" alt="Package Icon" class="package-icon" />
+                </div>
+            }
+        </div>
+    }
+}
+
+<style>
+    .package-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .package-item {
+        margin: 5px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+    }
+
+    .package-icon {
+        width: 30px;
+        height: 30px;
+        margin-right: 5px;
+    }
+</style>
+
+@code {
+    [Parameter] public string repoName { get; set; }
+}

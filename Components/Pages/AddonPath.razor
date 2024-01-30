@@ -19,7 +19,7 @@
             <!--<input type="checkbox" id="switch@(index)" /><label for="switch">Toggle</label>-->
 
             <label class="switch" style="background: @BackgroundColor" @onclick="ToggleSwitch">
-                <input type="checkbox" @bind="IsSwitchChecked" />
+                <input type="checkbox" @bind="IsSwitchChecked" id="switch(@index)"/>
                 <div></div>
             </label>
         </div>

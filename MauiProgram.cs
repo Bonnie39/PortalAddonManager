@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using PortalAddonManager.Services;
 
 namespace PortalAddonManager
 {
@@ -16,6 +17,7 @@ namespace PortalAddonManager
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddHttpClient();
+            builder.Services.AddSingleton<DataService>();
 
 #if DEBUG
     		builder.Services.AddBlazorWebViewDeveloperTools();

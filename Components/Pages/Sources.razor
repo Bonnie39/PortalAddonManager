@@ -3,41 +3,63 @@
 @using System.Net.Http
 @using Newtonsoft.Json
 @using PortalAddonManager.Models
+@using PortalAddonManager.Services
 @inject HttpClient Http
+@inject DataService DataService
 
 <h1>Sources</h1>
 
-@if (repos == null)
+@if (DataService.Repos == null)
 {
-    <p>Loading...</p>
+    <p>@currentState</p>
 }
 else
 {
-    @foreach (var repo in repos)
+    @foreach (var repo in DataService.Repos)
     {
-        <div>
+        <div class="repo-container">
             <h4>@repo.name</h4>
-            <img src="@repo.iconURL" alt="Repo Icon" width="50" height="50" />
+            <img src="@repo.iconURL" alt="Repo Icon" class="repo-icon" />
             <div>
-                @foreach (var package in repo.packages)
-                {
-                    <div>
-                        <h5>@package.name</h5>
-                        <img src="@package.iconURL" alt="Package Icon" width="30" height="30" />
-                    </div>
-                }
+                <a href="/packages/@repo.name" Match="NavLinkMatch.All">View Packages</a>
             </div>
         </div>
     }
 }
 
+<style>
+    .repo-container {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .repo-icon {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+    }
+</style>
+
 @code {
-    private List<Repository> repos;
+    private String? currentState = "Loading...";
 
     protected override async Task OnInitializedAsync()
     {
-        var jsonUrl = "https://example.com/yourrepo.json";
-        var json = await Http.GetStringAsync(jsonUrl);
-        repos = JsonConvert.DeserializeObject<List<Repository>>(json);
+        var jsonUrl = "https://raw.githubusercontent.com/Bonnie39/pam-repo/main/repository.json";
+        currentState = "Got JSON URL.";
+
+        try
+        {
+            var json = await Http.GetStringAsync(jsonUrl);
+            currentState = $"Received JSON: {json}";
+
+            DataService.Repos = JsonConvert.DeserializeObject<List<Repository>>(json);
+        }
+        catch (Exception ex)
+        {
+            currentState = $"Error: {ex.Message}";
+        }
     }
 }
