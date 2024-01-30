@@ -15,6 +15,7 @@ namespace PortalAddonManager
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddHttpClient();
 
 #if DEBUG
     		builder.Services.AddBlazorWebViewDeveloperTools();

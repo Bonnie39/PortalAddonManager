@@ -1,0 +1,36 @@
+{
+    "name": "My Source",
+    "description": "A small description",
+    "iconURL": "a.link.to/image.png",
+    "website": "https://author's.website",
+    "packages": [
+        {
+            "name": "My Addon",
+            "authorName": "Author's Name",
+            "subtitle": "A small description",
+            "iconURL": "a.link.to/package_icon.png",
+            "screenshotURLs": [
+                "a.link.to/screenshot1.png",
+                "a.link.to/screenshot2.png"
+            ],
+            "versions": [
+                {
+                    "version": "1.1",
+                    "date": "YYYY-MM-DD",
+                    "description": "very early test version (it sucks)",
+                    "vpkURL": "a.link.to/addon.vpk",
+                    "jsonURLL": "a.link.to/addon.json",
+                    "size-mb": "5 MB"
+                },
+                {
+                    "version": "1.0",
+                    "date": "YYYY-MM-DD",
+                    "description": "very early test version (it sucks)",
+                    "vpkURL": "a.link.to/addon.vpk",
+                    "jsonURLL": "a.link.to/addon.json",
+                    "size-mb": "5 MB"
+                  }
+              ]
+        }
+    ]
+  }

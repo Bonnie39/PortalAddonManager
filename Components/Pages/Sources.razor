@@ -1,153 +1,43 @@
 ﻿@page "/sources"
 
+@using System.Net.Http
+@using Newtonsoft.Json
+@using PortalAddonManager.Models
+@inject HttpClient Http
+
 <h1>Sources</h1>
 
-<p role="status">Path: @portalAddonPath</p>
-
-<!--<button class="btn btn-primary" @onclick="LocatePath">Get Path</button>-->
-
-<div class="addons-list">
-    @foreach (var addonFile in GetAddonFiles())
+@if (repos == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @foreach (var repo in repos)
     {
-        <div class="addon-card">
-            <div class="addon-header">
-                <h2>@addonFile.JsonData.Name</h2>
-                <p class="author">@addonFile.JsonData.Author</p>
-            </div>
-            <div class="addon-description" style="display: none;">
-                <p><strong>Description:</strong> @addonFile.JsonData.Description</p>
+        <div>
+            <h4>@repo.name</h4>
+            <img src="@repo.iconURL" alt="Repo Icon" width="50" height="50" />
+            <div>
+                @foreach (var package in repo.packages)
+                {
+                    <div>
+                        <h5>@package.name</h5>
+                        <img src="@package.iconURL" alt="Package Icon" width="30" height="30" />
+                    </div>
+                }
             </div>
         </div>
     }
-</div>
-
-<style>
-    .addons-list {
-        margin-top: 20px;
-    }
-
-    .addon-card {
-        background-color: #f8f8f8;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
-        cursor: pointer;
-    }
-
-    .addon-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .addon-card h2,
-    .author {
-        margin: 0;
-        font-size: 1.2em;
-    }
-
-    .addon-description {
-        margin-top: 10px;
-    }
-
-    .addon-card:hover {
-        background-color: #eaeaea;
-    }
-</style>
-
-<script>
-    // JavaScript to toggle the description visibility
-    function toggleDescription(card) {
-        var description = card.querySelector('.addon-description');
-        description.style.display = description.style.display === 'none' ? 'block' : 'none';
-    }
-</script>
+}
 
 @code {
+    private List<Repository> repos;
 
-    public static string? steamPath;
-    public static string? portalAddonPath;
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        LocatePath();
-    }
-
-    private void LocatePath()
-    {
-        if (steamPath == null)
-        {
-            Process[] steam = Process.GetProcessesByName("steam");
-            if (steam.Length > 0)
-            {
-                steamPath = steam[0].MainModule.FileName;
-
-                if (steamPath != null)
-                {
-                    steamPath = steamPath.Remove(29, 9);
-                }
-
-                if (portalAddonPath == null)
-                {
-                    portalAddonPath = steamPath + "steamapps\\common\\Portal\\portal\\custom";
-                }
-
-                Debug.WriteLine(portalAddonPath);
-
-            }
-            else
-            {
-                Debug.WriteLine("Unable to find Steam. Make sure it is open.");
-            }
-        }
-        else
-        {
-            return;
-        }
-    }
-
-    private IEnumerable<AddonInfo> GetAddonFiles()
-    {
-        if (Directory.Exists(portalAddonPath))
-        {
-            var vpkFiles = Directory.GetFiles(portalAddonPath, "*.vpk");
-
-            foreach (var vpkFile in vpkFiles)
-            {
-                var baseName = Path.GetFileNameWithoutExtension(vpkFile);
-                var jsonFile = Path.Combine(portalAddonPath, $"{baseName}.json");
-
-                if (File.Exists(jsonFile))
-                {
-                    var jsonData = JsonConvert.DeserializeObject<AddonData>(File.ReadAllText(jsonFile));
-                    yield return new AddonInfo
-                        {
-                            Name = baseName,
-                            JsonData = jsonData
-                        };
-                }
-            }
-        }
-        else
-        {
-            Debug.WriteLine("Portal addon path not found.");
-        }
-
-        // Use yield break to end the iteration
-        yield break;
-    }
-
-    public class AddonInfo
-    {
-        public string Name { get; set; } = string.Empty;
-        public AddonData JsonData { get; set; } = new AddonData();
-    }
-
-    public class AddonData
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Author { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        var jsonUrl = "https://example.com/yourrepo.json";
+        var json = await Http.GetStringAsync(jsonUrl);
+        repos = JsonConvert.DeserializeObject<List<Repository>>(json);
     }
 }

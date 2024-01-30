@@ -1,0 +1,18 @@
+﻿<!-- Components/Switch.razor -->
+<label class="switch" style="background: @BackgroundColor" @onclick="ToggleSwitch">
+    <input type="checkbox" checked="@IsSwitchChecked" />
+    <div></div>
+</label>
+
+@code {
+    [Parameter] public bool IsSwitchChecked { get; set; }
+    [Parameter] public EventCallback<bool> IsSwitchCheckedChanged { get; set; }
+
+    private string BackgroundColor => IsSwitchChecked ? "#43a1f9" : "#d1d1d1";
+
+    private void ToggleSwitch()
+    {
+        IsSwitchChecked = !IsSwitchChecked;
+        IsSwitchCheckedChanged.InvokeAsync(IsSwitchChecked);
+    }
+}

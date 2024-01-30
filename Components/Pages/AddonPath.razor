@@ -7,7 +7,7 @@
 <!--<button class="btn btn-primary" @onclick="LocatePath">Get Path</button>-->
 
 <div class="addons-list">
-    @foreach (var addonFile in GetAddonFiles())
+    @foreach (var (addonFile, index) in GetAddonFiles().Select((addon, index) => (addon, index)))
     {
         <div class="addon-card">
             <div class="addon-header">
@@ -16,9 +16,16 @@
                     <p class="author">@addonFile.JsonData.Author</p>
                 </div>
             </div>
+            <!--<input type="checkbox" id="switch@(index)" /><label for="switch">Toggle</label>-->
+
+            <label class="switch" style="background: @BackgroundColor" @onclick="ToggleSwitch">
+                <input type="checkbox" @bind="IsSwitchChecked" />
+                <div></div>
+            </label>
         </div>
     }
 </div>
+
 
 <style>
     .addons-list {
@@ -52,12 +59,56 @@
     .addon-description {
         margin-top: 10px;
     }
+
+    /*SWITCHES STYLES*/
+    .switch input {
+        position: absolute;
+        opacity: 0;
+    }
+
+    /**
+     * 1. Adjust this to size
+     */
+
+    .switch {
+        display: inline-block;
+        font-size: 20px; /* 1 */
+        height: 1em;
+        width: 2em;
+        border-radius: 1em;
+        transition: all 300ms;
+    }
+
+    .switch input:checked + div {
+        transform: translate3d(100%, 0, 0);
+    }
+
+    .switch div {
+        height: 1em;
+        width: 1em;
+        border-radius: 1em;
+        background: #FFF;
+        box-shadow: 0 0.1em 0.3em rgba(0,0,0,0.3);
+        transition: all 300ms;
+    }
+    
 </style>
 
 @code {
 
     public static string? steamPath;
     public static string? portalAddonPath;
+
+    private bool[] switchStates = new bool[5];
+
+    [Parameter] public bool IsSwitchChecked { get; set; }
+
+    private string BackgroundColor => IsSwitchChecked ? "#43a1f9" : "#d1d1d1";
+
+    private void ToggleSwitch()
+    {
+        IsSwitchChecked = !IsSwitchChecked;
+    }
 
     protected override void OnInitialized()
     {
