@@ -1,10 +1,18 @@
-﻿@page "/myaddons"
+﻿@page "/library"
 
 <h1>Library</h1>
 
-<p role="status">Addon Installation Path: @portalAddonPath</p>
+@if(steamPath == null)
+{
+    <p>Unable to automatically locate Portal's addon directory. Please make sure steam is running and reload this page.</p>
+    <button class="btn btn-primary" @onclick="LocatePath">Reload</button>
+}
+else
+{
+    <p role="status">Addon Installation Path: @portalAddonPath</p>
+}
 
-<!--<button class="btn btn-primary" @onclick="LocatePath">Get Path</button>-->
+
 
 <div class="addons-list">
     @foreach (var (addonFile, index) in GetAddonFiles().Select((addon, index) => (addon, index)))
@@ -96,8 +104,8 @@
 
 @code {
 
-    public static string? steamPath;
-    public static string? portalAddonPath;
+    private static string? steamPath;
+    private static string? portalAddonPath;
 
     private bool[] switchStates = new bool[5];
 
