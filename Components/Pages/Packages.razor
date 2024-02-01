@@ -4,7 +4,8 @@
 @using PortalAddonManager.Services
 @inject DataService DataService
 
-<h1>Packages for @repoName</h1>
+<a href="/sources" Match="NavLinkMatch.All">〈 Sources</a>
+<h1>@repoName</h1>
 
 @foreach (var repo in DataService.Repos)
 {
@@ -14,9 +15,11 @@
             @foreach (var package in repo.packages)
             {
                 <div class="package-item">
-                    <h5>@package.name</h5>
-                    <p>@package.subtitle</p>
                     <img src="@package.iconURL" alt="Package Icon" class="package-icon" />
+                    <div class="package-info">
+                        <h5>@package.name</h5>
+                        <p class="subtitle">@package.subtitle</p>
+                    </div>
                 </div>
             }
         </div>
@@ -30,18 +33,40 @@
     }
 
     .package-item {
-        margin: 5px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        background-color: #fff;
+        position: relative;
+        background-color: #f8f8f8;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        transition: all 0.25s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .package-icon {
-        width: 30px;
-        height: 30px;
-        margin-right: 5px;
+        width: 64px;
+        height: 64px;
+        margin-right: 10px;
+        border-radius: 18px;
     }
+
+    .package-info {
+        flex-grow: 1;
+    }
+
+        .package-info h5 {
+            margin: 0;
+        }
+
+        .package-info p.subtitle {
+            margin: 0;
+            font-size: 0.8em;
+            opacity: 0.5;
+        }
 </style>
+
 
 @code {
     [Parameter] public string repoName { get; set; }

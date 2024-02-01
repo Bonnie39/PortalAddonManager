@@ -12,8 +12,6 @@ else
     <p role="status">Addon Installation Path: @portalAddonPath</p>
 }
 
-
-
 <div class="addons-list">
     @foreach (var (addonFile, index) in GetAddonFiles().Select((addon, index) => (addon, index)))
     {
@@ -24,12 +22,15 @@ else
                     <p class="author">@addonFile.JsonData.Author</p>
                 </div>
             </div>
-            <!--<input type="checkbox" id="switch@(index)" /><label for="switch">Toggle</label>-->
 
-            <label class="switch" style="background: @BackgroundColor" @onclick="ToggleSwitch">
-                <input type="checkbox" @bind="IsSwitchChecked" id="switch(@index)"/>
-                <div></div>
-            </label>
+            <div class="switch">
+
+                <label class="switch-label">
+                    <input type="checkbox" class="checkbox" id="switch@(index)" checked="">
+                    <span class="switch-slider"></span>
+                </label>
+
+            </div>
         </div>
     }
 </div>
@@ -41,20 +42,18 @@ else
     }
 
     .addon-card {
+        position: relative;
         background-color: #f8f8f8;
         border: 1px solid #ddd;
         border-radius: 10px;
         padding: 15px;
         margin-bottom: 20px;
-    }
-
-    .addon-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
     }
 
-    .addon-card h2{ 
+    .addon-card h2 {
         margin: 0;
         font-size: 1.2em;
     }
@@ -68,55 +67,70 @@ else
         margin-top: 10px;
     }
 
-    /*SWITCHES STYLES*/
-    .switch input {
-        position: absolute;
-        opacity: 0;
-    }
-
-    /**
-     * 1. Adjust this to size
-     */
-
+    /* SWITCHES STYLES */
     .switch {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .switch label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 10px;
+        color: #555;
+        font-size: 12px;
+    }
+
+    .switch-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .switch-label .checkbox {
+        display: none;
+    }
+
+    .switch-slider {
+        position: relative;
         display: inline-block;
-        font-size: 20px; /* 1 */
-        height: 1em;
-        width: 2em;
-        border-radius: 1em;
-        transition: all 300ms;
+        width: 40px;
+        height: 20px;
+        background-color: rgba(0, 0, 0, 0.25);
+        transition: all 0.3s;
+        border-radius: 20px;
+        cursor: pointer;
     }
 
-    .switch input:checked + div {
-        transform: translate3d(100%, 0, 0);
+    .switch-slider::after {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background-color: white;
+        top: 1px;
+        left: 1px;
+        transition: all 0.3s;
     }
 
-    .switch div {
-        height: 1em;
-        width: 1em;
-        border-radius: 1em;
-        background: #FFF;
-        box-shadow: 0 0.1em 0.3em rgba(0,0,0,0.3);
-        transition: all 300ms;
+    .checkbox:checked + .switch-slider::after {
+        left: 20px;
     }
-    
+
+    .checkbox:checked + .switch-slider {
+        background-color: #007bff;
+    }
 </style>
 
 @code {
 
     private static string? steamPath;
     private static string? portalAddonPath;
-
-    private bool[] switchStates = new bool[5];
-
-    [Parameter] public bool IsSwitchChecked { get; set; }
-
-    private string BackgroundColor => IsSwitchChecked ? "#43a1f9" : "#d1d1d1";
-
-    private void ToggleSwitch()
-    {
-        IsSwitchChecked = !IsSwitchChecked;
-    }
 
     protected override void OnInitialized()
     {
@@ -178,7 +192,7 @@ else
                 }
                 else
                 {
-                    // Set default values for addons without a matching JSON file
+                    // handle addons that don't have a corresponding json file
                     yield return new AddonInfo
                         {
                             JsonData = new AddonData
@@ -196,7 +210,6 @@ else
             Debug.WriteLine("Portal addon path not found.");
         }
 
-        // Use yield break to end the iteration
         yield break;
     }
 
