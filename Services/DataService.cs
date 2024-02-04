@@ -16,5 +16,7 @@ namespace PortalAddonManager.Services
             get => repos ??= new List<Repository>();
             set => repos = value;
         }
+
+        public string? PortalAddonLocation;
     }
 }

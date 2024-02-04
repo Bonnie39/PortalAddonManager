@@ -1,12 +1,22 @@
 ﻿@page "/"
 
+@using PortalAddonManager.Services
+@inject DataService DataService
+
 <h1>Hello, world!</h1>
 
 Welcome to PortalAddonManager.
+<p>(very early beta test)</p>
 
-<div class="beta-text">
-	<p>(very early beta test)</p>
-</div>
+@if (steamPath == null)
+{
+    <p>Unable to automatically locate Portal's addon directory. Please make sure steam is running and reload this page.</p>
+    <button class="btn btn-primary" @onclick="LocatePath">Reload</button>
+}
+else
+{
+    <p role="status">Addon Installation Path: @DataService.PortalAddonLocation</p>
+}
 
 
 <style>
@@ -17,9 +27,44 @@ Welcome to PortalAddonManager.
 		height: 100vh;
 		margin: 0;
 	}
-
-	.beta-text {
-		margin-top: 15%;
-		opacity: 0.5;
-	}
 </style>
+
+@code {
+
+    private static string? steamPath;
+
+    protected override void OnInitialized()
+    {
+        LocatePath();
+    }
+
+    private void LocatePath()
+    {
+        if (steamPath == null)
+        {
+            Process[] steam = Process.GetProcessesByName("steam");
+            if (steam.Length > 0)
+            {
+                steamPath = steam[0].MainModule.FileName;
+
+                if (steamPath != null)
+                {
+                    steamPath = steamPath.Remove(29, 9);
+                }
+
+                if (DataService.PortalAddonLocation == null)
+                {
+                    DataService.PortalAddonLocation = steamPath + "steamapps\\common\\Portal\\portal\\custom";
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Unable to find Steam. Make sure it is open.");
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+}

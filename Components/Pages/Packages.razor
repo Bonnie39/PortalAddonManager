@@ -19,6 +19,20 @@
                     <div class="package-info">
                         <h5>@package.name</h5>
                         <p class="subtitle">@package.subtitle</p>
+
+                        @if (IsAddonInstalled(package.versions[0].vpkURL))
+                        {
+                            <button disabled class="native-button">INSTALLED</button>
+                        }
+                        else
+                        {
+                            <div class="loading-bar-container">
+                                <div class="loading-bar"></div>
+                                <button @onclick="() => BeginDownload(package.versions[0].vpkURL, package.versions[0].jsonURL)" class="native-button">
+                                    <text>@((IsDownloading(package.versions[0].vpkURL)) ? "Downloading..." : "GET")</text>
+                                </button>
+                            </div>
+                        }
                     </div>
                 </div>
             }
@@ -26,12 +40,10 @@
     }
 }
 
-<style>
-    .package-container {
-        display: flex;
-        flex-wrap: wrap;
-    }
 
+<p>@status</p>
+
+<style>
     .package-item {
         position: relative;
         background-color: #f8f8f8;
@@ -39,10 +51,15 @@
         border-radius: 10px;
         padding: 15px;
         margin-bottom: 20px;
-        display: flex;
-        align-items: center;
         transition: all 0.25s;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .package-item:hover {
+        transform: scale(1.005);
     }
 
     .package-icon {
@@ -56,18 +73,135 @@
         flex-grow: 1;
     }
 
-        .package-info h5 {
-            margin: 0;
+    .package-info h5 {
+        margin: 0;
+    }
+
+    .package-info p.subtitle {
+        margin: 0;
+        font-size: 0.8em;
+        opacity: 0.5;
+    }
+
+    .loading-bar-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .loading-bar {
+        height: 4px;
+        width: 100%;
+        background-color: #007bff;
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+    }
+
+        .loading-bar::before {
+            content: "";
+            display: block;
+            background-color: #ffff;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            transform: translateX(-100%);
+            transition: transform 2s linear;
         }
 
-        .package-info p.subtitle {
-            margin: 0;
-            font-size: 0.8em;
-            opacity: 0.5;
+        .loading-bar.loading::before {
+            transform: translateX(100%);
         }
+
+    .native-button {
+        /* Add styles for native Windows UI button here */
+    }
 </style>
 
 
 @code {
-    [Parameter] public string repoName { get; set; }
+    [Parameter] public string? repoName { get; set; }
+    private string status = "";
+    private HashSet<string> installedAddons = new HashSet<string>();
+    private HashSet<string> downloadingAddons = new HashSet<string>();
+
+    private bool IsAddonInstalled(string vpkURL)
+    {
+        string vpkFileName = Path.GetFileName(vpkURL);
+        return installedAddons.Contains(vpkFileName) || File.Exists(Path.Combine(DataService.PortalAddonLocation, vpkFileName));
+    }
+
+    private bool IsDownloading(string vpkURL)
+    {
+        string vpkFileName = Path.GetFileName(vpkURL);
+        return downloadingAddons.Contains(vpkFileName);
+    }
+
+    private async void BeginDownload(string vpkURL, string jsonURL)
+    {
+        string vpkFileName = Path.GetFileName(vpkURL);
+
+        // Check if already downloading
+        if (downloadingAddons.Contains(vpkFileName))
+        {
+            return;
+        }
+
+        downloadingAddons.Add(vpkFileName);
+
+        try
+        {
+            // Create tasks for downloading VPK and JSON asynchronously
+            var downloadVPKTask = DownloadVPK(vpkURL);
+            var downloadJSONTask = DownloadJSON(jsonURL);
+
+            // Wait for both tasks to complete
+            await Task.WhenAll(downloadVPKTask, downloadJSONTask);
+        }
+        finally
+        {
+            downloadingAddons.Remove(vpkFileName);
+            installedAddons.Add(vpkFileName);
+            StateHasChanged(); // Trigger a re-render to update the UI
+        }
+    }
+
+    private async Task DownloadVPK(string vpkURL)
+    {
+        await Task.Run(async () =>
+        {
+            // download VPK file
+            using (HttpClient client = new HttpClient())
+            {
+                byte[] vpkData = await client.GetByteArrayAsync(vpkURL);
+
+                // Get the filename
+                string vpkFileName = Path.GetFileName(vpkURL);
+
+                // Save the VPK file to the addons folder
+                string vpkFilePath = Path.Combine(DataService.PortalAddonLocation, vpkFileName);
+                await File.WriteAllBytesAsync(vpkFilePath, vpkData);
+            }
+        });
+    }
+
+    private async Task DownloadJSON(string jsonURL)
+    {
+        await Task.Run(async () =>
+        {
+            // download JSON file
+            using (HttpClient client = new HttpClient())
+            {
+                string jsonData = await client.GetStringAsync(jsonURL);
+
+                // Get the filename
+                string vpkFileName = Path.GetFileName(jsonURL);
+
+                // Save the JSON data to the addons folder
+                string jsonFileName = Path.Combine(DataService.PortalAddonLocation, vpkFileName);
+                await File.WriteAllTextAsync(jsonFileName, jsonData);
+            }
+        });
+    }
 }

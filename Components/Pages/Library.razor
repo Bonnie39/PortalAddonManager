@@ -1,16 +1,11 @@
 ﻿@page "/library"
 
+@using PortalAddonManager.Services
+@inject DataService DataService
+
 <h1>Library</h1>
 
-@if(steamPath == null)
-{
-    <p>Unable to automatically locate Portal's addon directory. Please make sure steam is running and reload this page.</p>
-    <button class="btn btn-primary" @onclick="LocatePath">Reload</button>
-}
-else
-{
-    <p role="status">Addon Installation Path: @portalAddonPath</p>
-}
+<p role="status">Addon Installation Path: @DataService.PortalAddonLocation</p>
 
 <div class="addons-list">
     @foreach (var (addonFile, index) in GetAddonFiles().Select((addon, index) => (addon, index)))
@@ -129,57 +124,16 @@ else
 
 @code {
 
-    private static string? steamPath;
-    private static string? portalAddonPath;
-
-    protected override void OnInitialized()
-    {
-        LocatePath();
-    }
-
-    private void LocatePath()
-    {
-        if (steamPath == null)
-        {
-            Process[] steam = Process.GetProcessesByName("steam");
-            if (steam.Length > 0)
-            {
-                steamPath = steam[0].MainModule.FileName;
-
-                if (steamPath != null)
-                {
-                    steamPath = steamPath.Remove(29, 9);
-                }
-
-                if (portalAddonPath == null)
-                {
-                    portalAddonPath = steamPath + "steamapps\\common\\Portal\\portal\\custom";
-                }
-
-                Debug.WriteLine(portalAddonPath);
-
-            }
-            else
-            {
-                Debug.WriteLine("Unable to find Steam. Make sure it is open.");
-            }
-        }
-        else
-        {
-            return;
-        }
-    }
-
     private IEnumerable<AddonInfo> GetAddonFiles()
     {
-        if (Directory.Exists(portalAddonPath))
+        if (Directory.Exists(DataService.PortalAddonLocation))
         {
-            var vpkFiles = Directory.GetFiles(portalAddonPath, "*.vpk");
+            var vpkFiles = Directory.GetFiles(DataService.PortalAddonLocation, "*.vpk");
 
             foreach (var vpkFile in vpkFiles)
             {
                 var baseName = Path.GetFileNameWithoutExtension(vpkFile);
-                var jsonFile = Path.Combine(portalAddonPath, $"{baseName}.json");
+                var jsonFile = Path.Combine(DataService.PortalAddonLocation, $"{baseName}.json");
 
                 if (File.Exists(jsonFile))
                 {
